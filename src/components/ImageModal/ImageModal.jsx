@@ -17,7 +17,7 @@ export default function ImageModal({
       contentLabel={alt_description}
       overlayClassName={css.overlay}
     >
-      <img src={full} alt={alt_description} />
+      <img src={full} alt={alt_description} className={css.image} />
     </Modal>
   );
 }

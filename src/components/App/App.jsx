@@ -18,6 +18,7 @@ export default function App() {
   const [showBtn, setShowBtn] = useState(false);
 
   useEffect(() => {
+    console.log(page);
     if (!searchQuery) {
       return;
     }
@@ -26,8 +27,9 @@ export default function App() {
       try {
         setError(false);
         setLoading(true);
-        const data = await getImages(searchQuery, page);
-        setImages((prevState) => [...prevState, ...data]);
+        const { results, totalPage } = await getImages(searchQuery, page);
+        setShowBtn(totalPage !== page);
+        setImages((prevState) => [...prevState, ...results]);
       } catch (error) {
         setError(true);
       } finally {
@@ -45,15 +47,8 @@ export default function App() {
 
   const handleLoadMore = () => {
     setPage((page) => page + 1);
+    console.log(page);
   };
-
-  {
-    (response) => {
-      setShowBtn(
-        response.data.total_pages && response.data.total_pages !== page
-      );
-    };
-  }
 
   const openModal = (image) => {
     setSelectedImage(image);
@@ -75,7 +70,7 @@ export default function App() {
       {images.length > 0 && <ImageGallery items={images} isOpen={openModal} />}
       {loading && <Loader />}
       {error && <ErrorMessage />}
-      {images.length > 0 && !loading && !showBtn && (
+      {images.length > 0 && !loading && showBtn && (
         <button className={css.button} onClick={handleLoadMore}>
           Load more
         </button>
