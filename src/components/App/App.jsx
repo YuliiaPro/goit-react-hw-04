@@ -4,8 +4,8 @@ import { getImages } from "../../images-api";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
-import css from "./App.module.css";
 import ImageModal from "../ImageModal/ImageModal";
+import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
 
 export default function App() {
   const [images, setImages] = useState([]);
@@ -18,7 +18,6 @@ export default function App() {
   const [showBtn, setShowBtn] = useState(false);
 
   useEffect(() => {
-    console.log(page);
     if (!searchQuery) {
       return;
     }
@@ -47,7 +46,6 @@ export default function App() {
 
   const handleLoadMore = () => {
     setPage((page) => page + 1);
-    console.log(page);
   };
 
   const openModal = (image) => {
@@ -71,9 +69,7 @@ export default function App() {
       {loading && <Loader />}
       {error && <ErrorMessage />}
       {images.length > 0 && !loading && showBtn && (
-        <button className={css.button} onClick={handleLoadMore}>
-          Load more
-        </button>
+        <LoadMoreBtn handleLoadMore={handleLoadMore} />
       )}
     </div>
   );
