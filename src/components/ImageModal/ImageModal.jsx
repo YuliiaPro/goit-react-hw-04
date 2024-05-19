@@ -4,10 +4,7 @@ import css from "./ImageModal.module.css";
 Modal.setAppElement("#modal");
 
 export default function ImageModal({
-  image: {
-    alt_description,
-    urls: { full },
-  },
+  image: { alt_description, urls: full },
   modalIsOpen,
   closeModal,
 }) {
