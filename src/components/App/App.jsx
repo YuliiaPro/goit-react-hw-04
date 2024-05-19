@@ -1,0 +1,85 @@
+import { useEffect, useState } from "react";
+import SearchBar from "../SearchBar/SearchBar";
+import { getImages } from "../../images-api";
+import ImageGallery from "../ImageGallery/ImageGallery";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import css from "./App.module.css";
+import ImageModal from "../ImageModal/ImageModal";
+
+export default function App() {
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [showBtn, setShowBtn] = useState(false);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      return;
+    }
+
+    async function fetchImages() {
+      try {
+        setError(false);
+        setLoading(true);
+        const data = await getImages(searchQuery, page);
+        setImages((prevState) => [...prevState, ...data]);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchImages();
+  }, [searchQuery, page]);
+
+  const handleSearch = async (topic) => {
+    setSearchQuery(topic);
+    setPage(1);
+    setImages([]);
+  };
+
+  const handleLoadMore = () => {
+    setPage((page) => page + 1);
+  };
+
+  {
+    (response) => {
+      setShowBtn(
+        response.data.total_pages && response.data.total_pages !== page
+      );
+    };
+  }
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <div>
+      <ImageModal
+        modalIsOpen={modalIsOpen}
+        image={selectedImage}
+        closeModal={closeModal}
+      />
+      <SearchBar onSubmit={handleSearch} searchQuery={searchQuery} />
+      {images.length > 0 && <ImageGallery items={images} isOpen={openModal} />}
+      {loading && <Loader />}
+      {error && <ErrorMessage />}
+      {images.length > 0 && !loading && !showBtn && (
+        <button className={css.button} onClick={handleLoadMore}>
+          Load more
+        </button>
+      )}
+    </div>
+  );
+}
